@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+      /* STEP 4: Set map height to 100% and
+                 the HTML and Body to be 100% */
+                 
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 400px;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+</head>
+<body>
+    <!-- STEP 2 : Add in a <div> for the map -->
+    <div id="map"></div>
+    
+    <button onClick="gotoKL()">Go to K.L.</button>
+    
+    <!-- STEP 1 : Add in the Google Map script with my API Key -->
+     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCTRO3velCzpqwm5VqqdFMWM05-Pnin4jw&callback=initMap"
+    async defer></script>
+    
+    <!-- STEP 3 Initialize in my own script -->
+    <script>
+      var map;
+     
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: 1.290, lng: 103.851},
+          zoom: 10
+        });
+        
+      }
+      
+      function gotoKL()
+      {
+          // STEP 5: Demonstrate that we can modify
+          // the google map via the map object
+          map.setCenter({lat: 3.1390, lng:101.6869});
+          map.setZoom(16)
+      }
+    </script>
+</body>
+</html>

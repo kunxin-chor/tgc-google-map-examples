@@ -1,64 +1,167 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-    <style>
-      /* STEP 4: Set map height to 100% and
-                 the HTML and Body to be 100% */
-                 
-      /* Always set the map height explicitly to define the size of the div
-       * element that contains the map. */
-      #map {
-        height: 100%;
-      }
-      /* Optional: Makes the sample page fill the window. */
-      html, body {
-        height: 400px;
-        margin: 0;
-        padding: 0;
-      }
-    </style>
-</head>
-<body>
-    <!-- STEP 2 : Add in a <div> for the map -->
-    <div id="map"></div>
-    
-    <button onClick="gotoKL()">Go to K.L.</button>
-    
-    <!-- STEP 1 : Add in the Google Map script with my API Key -->
-     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCTRO3velCzpqwm5VqqdFMWM05-Pnin4jw&callback=initMap"
-    async defer></script>
-    
-    <!-- STEP 3 Initialize in my own script -->
-    <script>
-      var map;
-      let myLatlng = {lat:-25.363, lng:131.044};
-      function initMap() {
-    
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: myLatlng,
-          zoom: 10
-        });
-        
-        var marker = new google.maps.Marker({
-          position: myLatlng,
-          map: map,
-          title: 'Click to zoom'
-        });
 
-        
-      }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    /* STEP 4: Set map height to 100% and
+                 the HTML and Body to be 100% */
+
+    /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+
+    #map {
+      height: 100%;
+    }
+
+    /* Optional: Makes the sample page fill the window. */
+
+    html,
+    body {
+      height: 400px;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- STEP 2 : Add in a <div> for the map -->
+  <div id="map"></div>
+
+  <div id="infowindow-content">
+    <img id="place-icon" src="" height="16" width="16">
+    <span id="place-name" class="title"></span><br> Place ID <span id="place-id"></span><br>
+    <span id="place-address"></span>
+  </div>
+
+  <button onClick="gotoKL()">Go to K.L.</button>
+  <button onClick="findChangiAirport()">Find Changi Airport</button>
+  <!-- STEP 1 : Add in the Google Map script with my API Key -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCTRO3velCzpqwm5VqqdFMWM05-Pnin4jw&callback=initMap&libraries=places" async defer></script>
+
+  <!-- STEP 3 Initialize in my own script -->
+  <script>
+    var map;
+    let myLatlng = { lat: -25.363, lng: 131.044 };
+    var service;
+    var infowindow;
+
+    function initMap() {
+
+      infowindow = new google.maps.InfoWindow();
+
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: myLatlng,
+        zoom: 10
+      });
+
+      var request = {
+        query: 'Plaza Singapura KFC',
+        fields: ['name', 'geometry'],
+      };
+
+      var marker = new google.maps.Marker({
+        position: myLatlng,
+        map: map,
+        title: 'Click to zoom'
+      });
+
+      var marker2 = new google.maps.Marker({
+        position: { lat: -25.4, lng: 132.044 },
+        map: map,
+        title: "Marker 2"
+      })
+
+      service = new google.maps.places.PlacesService(map);
+
+      // findPlaceFromQuery is asynchronous
+      service.findPlaceFromQuery(request, function(results, status) {
+        // if the status is OK
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+          for (var i = 0; i < results.length; i++) {
+            createMarker(results[i]);
+          }
+
+          map.setCenter(results[0].geometry.location);
+        }
+      });
+
+      // map.addListener('center_changed', function() {
+      //   // 3 seconds after the center of the map has changed, pan back to the
+      //   // marker.
+      //   window.setTimeout(function() {
+      //     map.panTo(marker.getPosition());
+      //   }, 3000);
+      // });
+
+
+      marker.addListener('click', function() {
+        map.setZoom(8);
+        map.setCenter(marker.getPosition());
+      });
+
+
+      marker2.addListener("click", function() {
+        map.setZoom(12);
+        map.setCenter(marker2.getPosition())
+      });
+
+    } // end initMap
+
+    function createMarker(place) {
+      var marker = new google.maps.Marker({
+        map: map,
+        position: place.geometry.location
+      });
+
+      google.maps.event.addListener(marker, 'click', function() {
+        infowindow.setContent(place.name);
+        infowindow.open(map, this);
+      });
+    }
+
+    function gotoKL() {
+      // STEP 5: Demonstrate that we can modify
+      // the google map via the map object
+      map.setCenter({ lat: 3.1390, lng: 101.6869 });
+      map.setZoom(16)
+    }
+
+    function findChangiAirport() {
       
-      function gotoKL()
-      {
-          // STEP 5: Demonstrate that we can modify
-          // the google map via the map object
-          map.setCenter({lat: 3.1390, lng:101.6869});
-          map.setZoom(16)
-      }
-    </script>
+       var request = {
+        query: 'Changi Airport',
+        fields: ['name', 'geometry'],
+      };
+      
+      // findPlaceFromQuery is asynchronous
+      service.findPlaceFromQuery(request, function(results, status) {
+        // if the status is OK
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+          for (var i = 0; i < results.length; i++) {
+            createMarker(results[i]);
+          }
+
+          map.setCenter(results[0].geometry.location);
+        }
+      });
+    }
+    
+    function search()
+    {
+       // get the query from the text box
+       
+       // find with google map places api
+       
+       // go there
+       
+       // zoom in
+    }
+  </script>
 </body>
+
 </html>
